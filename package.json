@@ -1,0 +1,17 @@
+{
+  "name": "scout",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @scout/api --filter @scout/web dev",
+    "dev:api": "pnpm --filter @scout/api dev",
+    "dev:web": "pnpm --filter @scout/web dev",
+    "build": "pnpm --filter @scout/shared build && pnpm --filter @scout/api build && pnpm --filter @scout/web build",
+    "start": "pnpm --filter @scout/api start",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
