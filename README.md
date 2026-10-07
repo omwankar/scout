@@ -1,6 +1,6 @@
 # Scout — Transparent Competitive Intel Browser Agent
 
-Scout is an AI browser agent that takes a plain-English research goal, autonomously browses public sites with Claude + Playwright, streams every thought/action/screenshot live, stays human-steerable, and finishes with a structured competitive brief.
+Scout is an AI browser agent that takes a plain-English research goal, autonomously browses public sites with OpenRouter free models + Playwright, streams every thought/action/screenshot live, stays human-steerable, and finishes with a structured competitive brief.
 
 ## Public demo
 
@@ -10,8 +10,8 @@ Scout is an AI browser agent that takes a plain-English research goal, autonomou
 
 ```bash
 cp .env.example .env
-# set ANTHROPIC_API_KEY (required)
-# optional but recommended: BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, TAVILY_API_KEY
+# set OPENROUTER_API_KEY (free: https://openrouter.ai/keys)
+# optional: BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, TAVILY_API_KEY
 pnpm install
 pnpm --filter @scout/shared build
 pnpm dev
@@ -35,7 +35,7 @@ pnpm dev
 | Requirement | How Scout meets it |
 |---|---|
 | Natural-language goal | Mission composer + presets |
-| Multi-step browser actions with LLM in the loop | Claude tool calls: search / navigate / click / type / scroll / extract / done / fail |
+| Multi-step browser actions with LLM in the loop | OpenRouter `openrouter/free` tool calls: search / navigate / click / type / scroll / extract / done / fail |
 | Show work live | SSE stream of thoughts, actions, screenshots, errors |
 | Human control | Stop, approve/skip gated steps, free-text steer |
 | Graceful stuck handling | Retries, visible errors, explicit `fail` with what was tried |
@@ -44,7 +44,7 @@ pnpm dev
 ## Architecture
 
 ```
-Next.js UI  --SSE/REST-->  Fastify API  -->  Claude (Anthropic)
+Next.js UI  --SSE/REST-->  Fastify API  -->  OpenRouter (free models)
                                 |
                                 +--> Playwright --> Browserbase (hosted) or local Chromium
                                 +--> Tavily (web search)
@@ -60,15 +60,17 @@ Monorepo:
 
 | Var | Purpose |
 |---|---|
-| `ANTHROPIC_API_KEY` | Required |
-| `ANTHROPIC_MODEL` | Default `claude-sonnet-4-6` |
+| `OPENROUTER_API_KEY` | Required — free key at https://openrouter.ai/keys |
+| `LLM_MODEL` | Default `openrouter/free` (routes to a $0 tool-calling model) |
+| `OPENROUTER_HTTP_REFERER` | App URL sent to OpenRouter (`HTTP-Referer`) |
+| `OPENROUTER_APP_TITLE` | App title sent to OpenRouter (`X-Title`) |
 | `BROWSERBASE_API_KEY` | Recommended for hosted browsers in production |
 | `BROWSERBASE_PROJECT_ID` | Required with Browserbase key |
-| `TAVILY_API_KEY` | Recommended — faster URL discovery via `search` tool |
+| `TAVILY_API_KEY` | Optional — faster URL discovery via `search` tool |
 | `PORT` | API port (default `3001`) |
 | `CORS_ORIGIN` | Dev: `http://localhost:3000` · Prod: `*` or your origin |
 | `NEXT_PUBLIC_API_URL` | Dev: `http://localhost:3001` · Prod: empty (same origin) |
-| `MAX_STEPS` | Default `20` |
+| `MAX_STEPS` | Default `16` |
 | `MAX_RUNTIME_MS` | Default `600000` (10 min) |
 | `REQUIRE_APPROVAL_DEFAULT` | `true`/`false` |
 
@@ -76,17 +78,18 @@ Monorepo:
 
 This repo ships a `render.yaml` Blueprint. The API listens on Render’s `PORT` and serves the static UI from the same origin.
 
-1. In the [Render dashboard](https://dashboard.render.com), choose **New → Blueprint**.
-2. Connect `omwankar/scout` (`master`) and apply `render.yaml`.
-3. When prompted, set `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, and (recommended) `BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID`.
-4. Health check: `/health`. Public URL: `https://omwankar-scout.onrender.com`.
+One-click: [Deploy to Render](https://render.com/deploy?repo=https://github.com/omwankar/scout)
+
+1. Open that link, sign in to Render, and apply the Blueprint (`omwankar-scout`).
+2. When prompted, set `OPENROUTER_API_KEY` (free). Optionally `TAVILY_API_KEY` and Browserbase.
+3. Health check: `/health`. Public URL: `https://omwankar-scout.onrender.com`.
 
 Leave `NEXT_PUBLIC_API_URL` empty so the UI talks to the API on the same origin. Do not hardcode `PORT` — Render injects it.
 
 ```bash
 # optional local docker check
 docker build -t scout .
-docker run --rm -p 3001:3001 -e PORT=3001 -e ANTHROPIC_API_KEY=... -e TAVILY_API_KEY=... -e CORS_ORIGIN=* scout
+docker run --rm -p 3001:3001 -e PORT=3001 -e OPENROUTER_API_KEY=... -e CORS_ORIGIN=* scout
 ```
 
 ## Design judgments
@@ -105,7 +108,7 @@ docker run --rm -p 3001:3001 -e PORT=3001 -e ANTHROPIC_API_KEY=... -e TAVILY_API
 
 ## Stack
 
-Anthropic Claude · Playwright · Browserbase · Tavily · Fastify · Next.js · TypeScript · Render/Docker
+OpenRouter (free) · Playwright · Browserbase · Tavily · Fastify · Next.js · TypeScript · Render/Docker
 
 ## Security note
 

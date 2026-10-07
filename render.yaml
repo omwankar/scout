@@ -21,8 +21,14 @@ services:
       - key: WEB_DIST
         value: /app/apps/web/out
       - key: LLM_PROVIDER
-        value: anthropic
-      - key: ANTHROPIC_API_KEY
+        value: openrouter
+      - key: LLM_MODEL
+        value: openrouter/free
+      - key: OPENROUTER_HTTP_REFERER
+        value: https://omwankar-scout.onrender.com
+      - key: OPENROUTER_APP_TITLE
+        value: Scout
+      - key: OPENROUTER_API_KEY
         sync: false
       - key: TAVILY_API_KEY
         sync: false

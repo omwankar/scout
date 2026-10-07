@@ -207,9 +207,9 @@ async function forceCompileBrief(
 }
 
 export async function runAgent(run: RunRecord): Promise<void> {
-  if (config.llmProvider === "none" || (!config.anthropicApiKey && !config.nvidiaApiKey)) {
+  if (!config.openrouterApiKey) {
     runStore.setStatus(run, "failed", "Missing LLM API key");
-    run.error = "Set ANTHROPIC_API_KEY (recommended) or NVIDIA_API_KEY, then restart.";
+    run.error = "Set OPENROUTER_API_KEY (free at https://openrouter.ai/keys), then restart.";
     runStore.emit(run, { type: "error", message: run.error, recoverable: false });
     return;
   }

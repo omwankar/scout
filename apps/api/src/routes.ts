@@ -13,12 +13,7 @@ export async function registerRoutes(app: FastifyInstance) {
     maxSteps: config.maxSteps,
     browser: config.useBrowserbase ? "browserbase" : "local",
     hasTavily: Boolean(config.tavilyApiKey),
-    hasLlmKey:
-      config.llmProvider === "anthropic"
-        ? Boolean(config.anthropicApiKey)
-        : config.llmProvider === "nvidia"
-          ? Boolean(config.nvidiaApiKey)
-          : false,
+    hasLlmKey: Boolean(config.openrouterApiKey),
   }));
 
   app.post<{ Body: CreateRunRequest }>("/api/runs", async (req, reply) => {
