@@ -7,7 +7,6 @@ ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_ENV=production
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 ENV HOST=0.0.0.0
-ENV PORT=3001
 ENV CORS_ORIGIN=*
 ENV NEXT_PUBLIC_API_URL=""
 ENV WEB_DIST=/app/apps/web/out
@@ -21,7 +20,7 @@ COPY apps/web/package.json ./apps/web/
 
 # Playwright browsers ship in the base image; skip download during install
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-# Railway may inject NODE_ENV=production at build time — still need typescript/etc.
+# Render may inject NODE_ENV=production at build time — still need typescript/etc.
 RUN pnpm install --frozen-lockfile=false --prod=false
 
 COPY . .
@@ -35,5 +34,5 @@ RUN pnpm --filter @scout/shared build \
 
 ENV NODE_ENV=production
 WORKDIR /app/apps/api
-EXPOSE 3001
+EXPOSE 10000
 CMD ["node", "dist/index.js"]

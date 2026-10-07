@@ -5,24 +5,21 @@ import { runAgent } from "./agent.js";
 import { runStore } from "./run-store.js";
 
 export async function registerRoutes(app: FastifyInstance) {
-  app.get("/health", async (_req, reply) => {
-    const body = {
-      ok: config.ready,
-      llmProvider: config.llmProvider,
-      model: config.model,
-      maxSteps: config.maxSteps,
-      browser: config.useBrowserbase ? "browserbase" : "local",
-      hasTavily: Boolean(config.tavilyApiKey),
-      hasLlmKey:
-        config.llmProvider === "anthropic"
-          ? Boolean(config.anthropicApiKey)
-          : config.llmProvider === "nvidia"
-            ? Boolean(config.nvidiaApiKey)
-            : false,
-    };
-    if (!body.ok) return reply.code(503).send(body);
-    return body;
-  });
+  app.get("/health", async () => ({
+    ok: true,
+    ready: config.ready,
+    llmProvider: config.llmProvider,
+    model: config.model,
+    maxSteps: config.maxSteps,
+    browser: config.useBrowserbase ? "browserbase" : "local",
+    hasTavily: Boolean(config.tavilyApiKey),
+    hasLlmKey:
+      config.llmProvider === "anthropic"
+        ? Boolean(config.anthropicApiKey)
+        : config.llmProvider === "nvidia"
+          ? Boolean(config.nvidiaApiKey)
+          : false,
+  }));
 
   app.post<{ Body: CreateRunRequest }>("/api/runs", async (req, reply) => {
     const goal = (req.body?.goal ?? "").trim();

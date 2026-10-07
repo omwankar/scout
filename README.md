@@ -4,7 +4,7 @@ Scout is an AI browser agent that takes a plain-English research goal, autonomou
 
 ## Public demo
 
-**https://scout-production-05ad.up.railway.app**
+**https://omwankar-scout.onrender.com**
 
 **Local:**
 
@@ -72,17 +72,21 @@ Monorepo:
 | `MAX_RUNTIME_MS` | Default `600000` (10 min) |
 | `REQUIRE_APPROVAL_DEFAULT` | `true`/`false` |
 
-## Deploy on Railway
+## Deploy on Render
 
-1. Create a new Railway project from this repo (Dockerfile builder).
-2. Set `ANTHROPIC_API_KEY`, `CORS_ORIGIN=*`, `PORT=3001`.
-3. For same-origin UI+API, leave `NEXT_PUBLIC_API_URL` empty **before build**, or rebuild with it pointing at the public API URL.
-4. Expose port `3001`. Health check: `/health`.
+This repo ships a `render.yaml` Blueprint. The API listens on Render’s `PORT` and serves the static UI from the same origin.
+
+1. In the [Render dashboard](https://dashboard.render.com), choose **New → Blueprint**.
+2. Connect `omwankar/scout` (`master`) and apply `render.yaml`.
+3. When prompted, set `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, and (recommended) `BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID`.
+4. Health check: `/health`. Public URL: `https://omwankar-scout.onrender.com`.
+
+Leave `NEXT_PUBLIC_API_URL` empty so the UI talks to the API on the same origin. Do not hardcode `PORT` — Render injects it.
 
 ```bash
 # optional local docker check
 docker build -t scout .
-docker run --rm -p 3001:3001 -e ANTHROPIC_API_KEY=... -e CORS_ORIGIN=* scout
+docker run --rm -p 3001:3001 -e PORT=3001 -e ANTHROPIC_API_KEY=... -e TAVILY_API_KEY=... -e CORS_ORIGIN=* scout
 ```
 
 ## Design judgments
@@ -101,7 +105,7 @@ docker run --rm -p 3001:3001 -e ANTHROPIC_API_KEY=... -e CORS_ORIGIN=* scout
 
 ## Stack
 
-Anthropic Claude · Playwright · Browserbase · Tavily · Fastify · Next.js · TypeScript · Railway/Docker
+Anthropic Claude · Playwright · Browserbase · Tavily · Fastify · Next.js · TypeScript · Render/Docker
 
 ## Security note
 
